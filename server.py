@@ -125,6 +125,26 @@ async def legion_get_pipeline() -> str:
 
 
 # ═══════════════════════════════════════
+# TOOLS — LEAD ENRICHMENT
+# ═══════════════════════════════════════
+
+@mcp.tool()
+async def legion_enrich_lead(lead_id: int, cnpj: str = "", website: str = "", linkedin_url: str = "") -> str:
+    """Enrich a lead with real data: CNPJ lookup (ReceitaWS), website scraping, and AI analysis.
+    Returns company info, pain points, tech stack, competitors, and qualification scores."""
+    input_data = {"leadId": lead_id}
+    if cnpj:
+        input_data["cnpj"] = cnpj
+    if website:
+        input_data["website"] = website
+    if linkedin_url:
+        input_data["linkedinUrl"] = linkedin_url
+    
+    result = await trpc_mutation("enrichment.smartEnrich", {"json": input_data})
+    return json.dumps(result, indent=2, ensure_ascii=False)
+
+
+# ═══════════════════════════════════════
 # TOOLS — CALL INTELLIGENCE
 # ═══════════════════════════════════════
 
