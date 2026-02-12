@@ -222,6 +222,51 @@ async def legion_goal_attainment(period: str = "month") -> str:
 
 
 # ═══════════════════════════════════════
+# TOOLS — AI EMAIL COMPOSER
+# ═══════════════════════════════════════
+
+@mcp.tool()
+async def legion_compose_email(type: str = "cold_outreach", lead_id: int = 0, context: str = "", tone: str = "friendly") -> str:
+    """AI-compose sales email. Types: cold_outreach, follow_up, proposal, meeting_request, thank_you, breakup, reactivation, referral_ask."""
+    input_data = {"type": type, "tone": tone}
+    if lead_id > 0:
+        input_data["leadId"] = lead_id
+    if context:
+        input_data["context"] = context
+    result = await trpc_mutation("emailComposer.compose", {"json": input_data})
+    return json.dumps(result, indent=2, ensure_ascii=False)
+
+
+@mcp.tool()
+async def legion_improve_email(subject: str, body: str) -> str:
+    """AI-improve an existing email: scores original, rewrites, and explains changes."""
+    result = await trpc_mutation("emailComposer.improve", {"json": {"subject": subject, "body": body}})
+    return json.dumps(result, indent=2, ensure_ascii=False)
+
+
+# ═══════════════════════════════════════
+# TOOLS — CONTACT TIMELINE
+# ═══════════════════════════════════════
+
+@mcp.tool()
+async def legion_timeline(lead_id: int) -> str:
+    """Get full interaction timeline for a lead: calls, emails, deals, enrichment, sequences, activities."""
+    result = await trpc_query("timeline.get", {"leadId": lead_id})
+    return json.dumps(result, indent=2, ensure_ascii=False)
+
+
+# ═══════════════════════════════════════
+# TOOLS — DASHBOARD
+# ═══════════════════════════════════════
+
+@mcp.tool()
+async def legion_dashboard() -> str:
+    """Full dashboard summary: leads, deals, calls, emails, pipeline value, win rate, recent activity."""
+    result = await trpc_query("dashSummary.summary")
+    return json.dumps(result, indent=2, ensure_ascii=False)
+
+
+# ═══════════════════════════════════════
 # TOOLS — DEAL SCORING
 # ═══════════════════════════════════════
 
@@ -505,17 +550,6 @@ async def legion_win_loss_analysis() -> str:
 async def legion_agent_performance(days: int = 30) -> str:
     """AI agent performance dashboard: actions per agent, trends, lead distribution."""
     result = await trpc_query("agentAnalytics.performance", {"days": days})
-    return json.dumps(result, indent=2, ensure_ascii=False)
-
-
-# ═══════════════════════════════════════
-# TOOLS — UNIFIED DASHBOARD
-# ═══════════════════════════════════════
-
-@mcp.tool()
-async def legion_dashboard() -> str:
-    """Full platform dashboard: leads, pipeline, call intelligence, sequences — all in one."""
-    result = await trpc_query("unifiedDashboard.stats")
     return json.dumps(result, indent=2, ensure_ascii=False)
 
 
