@@ -238,6 +238,98 @@ async def legion_forecast_summary() -> str:
 
 
 # ═══════════════════════════════════════
+# TOOLS — CONTACT DATABASE
+# ═══════════════════════════════════════
+
+@mcp.tool()
+async def legion_search_contacts(query: str = "", status: str = "", min_score: int = 0) -> str:
+    """Search leads/contacts by name, email, phone, company. Filter by status (hot/warm/cold) and minimum score."""
+    params = {}
+    if query:
+        params["query"] = query
+    if status:
+        params["status"] = status
+    if min_score > 0:
+        params["minScore"] = min_score
+    result = await trpc_query("contactDatabase.search", params)
+    return json.dumps(result, indent=2, ensure_ascii=False)
+
+
+@mcp.tool()
+async def legion_bulk_import_leads(leads_json: str) -> str:
+    """Bulk import leads. leads_json is a JSON array of objects with name, email, phone, company, status, source."""
+    import json as j
+    leads_data = j.loads(leads_json)
+    result = await trpc_mutation("contactDatabase.bulkImport", {"json": {"leads": leads_data}})
+    return json.dumps(result, indent=2, ensure_ascii=False)
+
+
+@mcp.tool()
+async def legion_contact_stats() -> str:
+    """Get contact database stats: total, by status, by source, by agent, coverage metrics."""
+    result = await trpc_query("contactDatabase.stats")
+    return json.dumps(result, indent=2, ensure_ascii=False)
+
+
+# ═══════════════════════════════════════
+# TOOLS — DEAL SCORING
+# ═══════════════════════════════════════
+
+@mcp.tool()
+async def legion_score_deals() -> str:
+    """Score all open deals based on engagement, fit, timing, and competition signals. Updates probabilities."""
+    result = await trpc_mutation("dealScoring.scoreAll", {"json": {}})
+    return json.dumps(result, indent=2, ensure_ascii=False)
+
+
+# ═══════════════════════════════════════
+# TOOLS — COMPETITIVE INTELLIGENCE
+# ═══════════════════════════════════════
+
+@mcp.tool()
+async def legion_competitive_overview() -> str:
+    """See all competitors mentioned in calls with frequency, objections, and patterns."""
+    result = await trpc_query("competitiveIntel.overview")
+    return json.dumps(result, indent=2, ensure_ascii=False)
+
+
+@mcp.tool()
+async def legion_battle_card(competitor_name: str) -> str:
+    """Generate AI battle card for a competitor: strengths, weaknesses, objection handlers, win strategies."""
+    result = await trpc_mutation("competitiveIntel.battleCard", {"json": {"competitorName": competitor_name}})
+    return json.dumps(result, indent=2, ensure_ascii=False)
+
+
+@mcp.tool()
+async def legion_win_loss_analysis() -> str:
+    """Win/loss analysis: win rate, average deal sizes, lost reasons breakdown."""
+    result = await trpc_query("competitiveIntel.winLoss")
+    return json.dumps(result, indent=2, ensure_ascii=False)
+
+
+# ═══════════════════════════════════════
+# TOOLS — AGENT ANALYTICS
+# ═══════════════════════════════════════
+
+@mcp.tool()
+async def legion_agent_performance(days: int = 30) -> str:
+    """AI agent performance dashboard: actions per agent, trends, lead distribution."""
+    result = await trpc_query("agentAnalytics.performance", {"days": days})
+    return json.dumps(result, indent=2, ensure_ascii=False)
+
+
+# ═══════════════════════════════════════
+# TOOLS — UNIFIED DASHBOARD
+# ═══════════════════════════════════════
+
+@mcp.tool()
+async def legion_dashboard() -> str:
+    """Full platform dashboard: leads, pipeline, call intelligence, sequences — all in one."""
+    result = await trpc_query("unifiedDashboard.stats")
+    return json.dumps(result, indent=2, ensure_ascii=False)
+
+
+# ═══════════════════════════════════════
 # TOOLS — AGENTS & BOARDROOM
 # ═══════════════════════════════════════
 
