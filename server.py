@@ -173,6 +173,55 @@ async def legion_list_calls(limit: int = 20) -> str:
 
 
 # ═══════════════════════════════════════
+# TOOLS — KNOWLEDGE BASE
+# ═══════════════════════════════════════
+
+@mcp.tool()
+async def legion_knowledge_ask(question: str, agent: str = "") -> str:
+    """Ask a question answered by the knowledge base (sales playbooks, product info, FAQs). AI-powered RAG."""
+    input_data = {"question": question}
+    if agent:
+        input_data["agentContext"] = agent
+    result = await trpc_mutation("knowledgeBase.ask", {"json": input_data})
+    return json.dumps(result, indent=2, ensure_ascii=False)
+
+
+@mcp.tool()
+async def legion_knowledge_add(title: str, content: str, category: str = "sales") -> str:
+    """Add a document to the knowledge base. Categories: technical, sales, product, faq, policy, training."""
+    result = await trpc_mutation("knowledgeBase.add", {"json": {"title": title, "content": content, "category": category}})
+    return json.dumps(result, indent=2, ensure_ascii=False)
+
+
+@mcp.tool()
+async def legion_knowledge_list(category: str = "") -> str:
+    """List all knowledge base documents, optionally filtered by category."""
+    params = {}
+    if category:
+        params["category"] = category
+    result = await trpc_query("knowledgeBase.list", params)
+    return json.dumps(result, indent=2, ensure_ascii=False)
+
+
+# ═══════════════════════════════════════
+# TOOLS — PIPELINE VELOCITY & GOALS
+# ═══════════════════════════════════════
+
+@mcp.tool()
+async def legion_pipeline_velocity() -> str:
+    """Pipeline velocity metrics: deals per stage, average cycle time, conversion rates, flow rate (R$/day)."""
+    result = await trpc_query("pipelineVelocity.metrics")
+    return json.dumps(result, indent=2, ensure_ascii=False)
+
+
+@mcp.tool()
+async def legion_goal_attainment(period: str = "month") -> str:
+    """Quota/goal attainment: revenue vs target, deals closed, leads generated, days remaining, on-track status."""
+    result = await trpc_query("goals.attainment", {"period": period})
+    return json.dumps(result, indent=2, ensure_ascii=False)
+
+
+# ═══════════════════════════════════════
 # TOOLS — MULTICHANNEL SEQUENCES
 # ═══════════════════════════════════════
 
