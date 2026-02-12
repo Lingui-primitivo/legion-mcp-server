@@ -33,10 +33,7 @@ GITHUB_REPO = os.environ.get("GITHUB_REPO", "Lingui-primitivo/LEGION-IA-RAILWAY"
 # MCP SERVER
 # ═══════════════════════════════════════
 
-mcp = FastMCP(
-    "legion-ai",
-    description="LEGION AI Platform — Operate the entire sales automation system: leads, deals, agents, campaigns, analytics, and deployments.",
-)
+mcp = FastMCP("legion-ai")
 
 # ═══════════════════════════════════════
 # HELPERS
