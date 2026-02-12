@@ -173,6 +173,52 @@ async def legion_list_calls(limit: int = 20) -> str:
 
 
 # ═══════════════════════════════════════
+# TOOLS — MULTICHANNEL SEQUENCES
+# ═══════════════════════════════════════
+
+@mcp.tool()
+async def legion_list_sequences() -> str:
+    """List all multichannel outreach sequences with steps, enrollments, and stats."""
+    result = await trpc_query("sequences.list")
+    return json.dumps(result, indent=2, ensure_ascii=False)
+
+
+@mcp.tool()
+async def legion_create_sequence(name: str, description: str = "", steps: str = "") -> str:
+    """Create a new multichannel sequence. Steps is a JSON array of steps with channel (email/whatsapp/linkedin/call/delay), message, subject (for email), delayDays."""
+    import json as j
+    input_data = {"name": name, "description": description}
+    if steps:
+        input_data["steps"] = j.loads(steps)
+    result = await trpc_mutation("sequences.create", {"json": input_data})
+    return json.dumps(result, indent=2, ensure_ascii=False)
+
+
+@mcp.tool()
+async def legion_ai_generate_sequence(goal: str, channels: str = "email,whatsapp", total_steps: int = 5, target_audience: str = "", product: str = "") -> str:
+    """AI-generate a complete multichannel sequence. Provide the goal (e.g., 'book demos with doctors') and channels."""
+    input_data = {
+        "goal": goal,
+        "channels": channels.split(","),
+        "totalSteps": total_steps,
+    }
+    if target_audience:
+        input_data["targetAudience"] = target_audience
+    if product:
+        input_data["product"] = product
+    result = await trpc_mutation("sequences.aiGenerate", {"json": input_data})
+    return json.dumps(result, indent=2, ensure_ascii=False)
+
+
+@mcp.tool()
+async def legion_enroll_in_sequence(sequence_id: int, lead_ids: str = "") -> str:
+    """Enroll leads into a sequence. lead_ids is comma-separated (e.g., '1,2,3')."""
+    ids = [int(x.strip()) for x in lead_ids.split(",") if x.strip()]
+    result = await trpc_mutation("sequences.enroll", {"json": {"sequenceId": sequence_id, "leadIds": ids}})
+    return json.dumps(result, indent=2, ensure_ascii=False)
+
+
+# ═══════════════════════════════════════
 # TOOLS — REVENUE FORECASTING
 # ═══════════════════════════════════════
 
