@@ -33,7 +33,7 @@ GITHUB_REPO = os.environ.get("GITHUB_REPO", "Lingui-primitivo/LEGION-IA-RAILWAY"
 # MCP SERVER
 # ═══════════════════════════════════════
 
-mcp = FastMCP("legion-ai")
+mcp = FastMCP("legion-ai", host="0.0.0.0", port=int(os.environ.get("PORT", "8080")))
 
 # ═══════════════════════════════════════
 # HELPERS
@@ -288,5 +288,4 @@ async def legion_db_query(query_description: str) -> str:
 # ═══════════════════════════════════════
 
 if __name__ == "__main__":
-    port = int(os.environ.get("PORT", "8080"))
-    mcp.run(transport="sse", host="0.0.0.0", port=port)
+    mcp.run(transport="sse")
