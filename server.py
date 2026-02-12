@@ -173,6 +173,25 @@ async def legion_list_calls(limit: int = 20) -> str:
 
 
 # ═══════════════════════════════════════
+# TOOLS — REVENUE FORECASTING
+# ═══════════════════════════════════════
+
+@mcp.tool()
+async def legion_forecast() -> str:
+    """Generate AI-powered revenue forecast. Combines CRM deal data with Call Intelligence
+    signals (sentiment, BANT scores, objections) to predict deal outcomes and pipeline health."""
+    result = await trpc_mutation("forecasting.generate", {"json": {}})
+    return json.dumps(result, indent=2, ensure_ascii=False)
+
+
+@mcp.tool()
+async def legion_forecast_summary() -> str:
+    """Quick pipeline summary: total deals, win rate, pipeline value, deals closing this month."""
+    result = await trpc_query("forecasting.summary")
+    return json.dumps(result, indent=2, ensure_ascii=False)
+
+
+# ═══════════════════════════════════════
 # TOOLS — AGENTS & BOARDROOM
 # ═══════════════════════════════════════
 
