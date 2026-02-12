@@ -222,6 +222,82 @@ async def legion_goal_attainment(period: str = "month") -> str:
 
 
 # ═══════════════════════════════════════
+# TOOLS — EMAIL DELIVERABILITY
+# ═══════════════════════════════════════
+
+@mcp.tool()
+async def legion_check_domain(domain: str) -> str:
+    """Check email domain health: SPF, DKIM, DMARC, MX records. Returns score and recommendations."""
+    result = await trpc_mutation("deliverability.checkDomain", {"json": {"domain": domain}})
+    return json.dumps(result, indent=2, ensure_ascii=False)
+
+
+@mcp.tool()
+async def legion_email_stats(days: int = 30) -> str:
+    """Get email deliverability stats: delivery rate, open rate, bounce rate, reputation score."""
+    result = await trpc_query("deliverability.stats", {"days": days})
+    return json.dumps(result, indent=2, ensure_ascii=False)
+
+
+# ═══════════════════════════════════════
+# TOOLS — AUTOMATION RULES
+# ═══════════════════════════════════════
+
+@mcp.tool()
+async def legion_list_automations() -> str:
+    """List all workflow automation rules (if-this-then-that for sales)."""
+    result = await trpc_query("automation.list")
+    return json.dumps(result, indent=2, ensure_ascii=False)
+
+
+@mcp.tool()
+async def legion_automation_presets() -> str:
+    """Get preset automation templates: deal alerts, follow-up triggers, scoring rules."""
+    result = await trpc_query("automation.presets")
+    return json.dumps(result, indent=2, ensure_ascii=False)
+
+
+# ═══════════════════════════════════════
+# TOOLS — A/B TESTING
+# ═══════════════════════════════════════
+
+@mcp.tool()
+async def legion_ab_suggest(type: str = "subject", original: str = "", audience: str = "", goal: str = "") -> str:
+    """AI-generate A/B test variants for email subjects or message bodies."""
+    result = await trpc_mutation("abTesting.suggest", {"json": {"type": type, "original": original, "audience": audience, "goal": goal}})
+    return json.dumps(result, indent=2, ensure_ascii=False)
+
+
+# ═══════════════════════════════════════
+# TOOLS — TEAM PERFORMANCE
+# ═══════════════════════════════════════
+
+@mcp.tool()
+async def legion_scorecard(days: int = 30) -> str:
+    """Get sales performance scorecard: deals won/lost, call quality, email metrics, overall grade."""
+    result = await trpc_query("teamPerformance.scorecard", {"days": days})
+    return json.dumps(result, indent=2, ensure_ascii=False)
+
+
+@mcp.tool()
+async def legion_coaching() -> str:
+    """Get AI coaching recommendations based on recent performance data."""
+    result = await trpc_mutation("teamPerformance.coaching", {"json": {}})
+    return json.dumps(result, indent=2, ensure_ascii=False)
+
+
+# ═══════════════════════════════════════
+# TOOLS — SMART NOTIFICATIONS
+# ═══════════════════════════════════════
+
+@mcp.tool()
+async def legion_notifications() -> str:
+    """Generate smart AI-prioritized notifications: deal risks, stale leads, coaching opportunities."""
+    result = await trpc_mutation("smartNotifications.generate", {"json": {}})
+    return json.dumps(result, indent=2, ensure_ascii=False)
+
+
+# ═══════════════════════════════════════
 # TOOLS — MULTICHANNEL SEQUENCES
 # ═══════════════════════════════════════
 
