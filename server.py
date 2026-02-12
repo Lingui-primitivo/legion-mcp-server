@@ -222,6 +222,71 @@ async def legion_goal_attainment(period: str = "month") -> str:
 
 
 # ═══════════════════════════════════════
+# TOOLS — DEAL SCORING
+# ═══════════════════════════════════════
+
+@mcp.tool()
+async def legion_score_deal(deal_id: int) -> str:
+    """AI-score a deal based on engagement, fit, timing, champion, and competition signals. Updates probability."""
+    result = await trpc_mutation("dealScoring.score", {"json": {"dealId": deal_id}})
+    return json.dumps(result, indent=2, ensure_ascii=False)
+
+
+# ═══════════════════════════════════════
+# TOOLS — SALES PLAYBOOK
+# ═══════════════════════════════════════
+
+@mcp.tool()
+async def legion_handle_objection(objection: str, context: str = "", tone: str = "consultative") -> str:
+    """Get AI responses for a sales objection. Returns 3 scripts with different techniques."""
+    result = await trpc_mutation("playbook.handleObjection", {"json": {"objection": objection, "context": context, "tone": tone}})
+    return json.dumps(result, indent=2, ensure_ascii=False)
+
+
+@mcp.tool()
+async def legion_battle_card(competitor: str, product: str = "") -> str:
+    """Generate competitive battle card: strengths, weaknesses, talking points, objection responses."""
+    result = await trpc_mutation("playbook.battleCard", {"json": {"competitor": competitor, "product": product}})
+    return json.dumps(result, indent=2, ensure_ascii=False)
+
+
+@mcp.tool()
+async def legion_pitch_script(product: str, audience: str, format: str = "cold_call") -> str:
+    """Generate pitch script for cold calls, emails, demos, or elevator pitches."""
+    result = await trpc_mutation("playbook.pitchScript", {"json": {"product": product, "audience": audience, "format": format}})
+    return json.dumps(result, indent=2, ensure_ascii=False)
+
+
+# ═══════════════════════════════════════
+# TOOLS — PIPELINE ANALYTICS
+# ═══════════════════════════════════════
+
+@mcp.tool()
+async def legion_pipeline_analytics(days: int = 90) -> str:
+    """Deep pipeline analysis: stage distribution, conversion rates, velocity, bottlenecks, loss reasons."""
+    result = await trpc_query("pipelineAnalytics.analyze", {"days": days})
+    return json.dumps(result, indent=2, ensure_ascii=False)
+
+
+# ═══════════════════════════════════════
+# TOOLS — IMPORT/EXPORT
+# ═══════════════════════════════════════
+
+@mcp.tool()
+async def legion_export_leads(format: str = "json") -> str:
+    """Export all leads as JSON or CSV."""
+    result = await trpc_query("importExport.exportLeads", {"format": format})
+    return json.dumps(result, indent=2, ensure_ascii=False)
+
+
+@mcp.tool()
+async def legion_export_deals(format: str = "json") -> str:
+    """Export all deals as JSON or CSV."""
+    result = await trpc_query("importExport.exportDeals", {"format": format})
+    return json.dumps(result, indent=2, ensure_ascii=False)
+
+
+# ═══════════════════════════════════════
 # TOOLS — EMAIL DELIVERABILITY
 # ═══════════════════════════════════════
 
